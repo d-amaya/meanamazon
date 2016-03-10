@@ -4,10 +4,11 @@ var mocha = require("gulp-mocha");
 gulp.task("test", function() {
     var error = false;
     gulp
-    .src("./test/test1.js")
+    .src("./test/*.js")
     .pipe(mocha())
-    .on("error", function() {
+    .on("error", function(error) {
         console.log("Testes failed!");
+        console.log(error);
         error = true;
     })
     .on("end", function() {
@@ -18,5 +19,5 @@ gulp.task("test", function() {
 });
 
 gulp.task("watch", function() {
-    gulp.watch(["./test/*.js", "./routes/*.js"], ["test"]);
+    gulp.watch(["./test/*.js", "./routes/*.js", "./schemas/**/*.js"], ["test"]);
 });

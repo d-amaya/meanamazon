@@ -6,10 +6,10 @@ module.exports = function(wagner) {
     
     var Category = mongoose.model("Category", categorySchema, "categories");
     wagner.factory("Category", function() {
-        return Category; 
+        return Category;
     });
     
     return {
-      Category: Category  
+      Category: Category
     };
 };

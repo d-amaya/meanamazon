@@ -4,7 +4,8 @@
  * Module dependencies.
  */
 
-var app = require('../app');
+var wagner = require("wagner-core");
+var app = require('../app')(wagner);
 var debug = require('debug')('EdxRestAPI:server');
 var http = require('http');
 
