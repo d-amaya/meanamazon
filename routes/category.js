@@ -28,7 +28,7 @@ module.exports = function(wagner) {
     router.get("/parent/:id", wagner.invoke(function(Category) {
         return function(req, res) { 
             Category.
-            find({ parents: req.params.id }).
+            find({ parent: req.params.id }).
             sort({ _id: 1 }).
             exec(function(error, categories) {
                 if (error) {

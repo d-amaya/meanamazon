@@ -44,4 +44,30 @@ describe("Category API", function() {
             });
         };
     }));
+    
+    it("can load all categories that have a certain parent", wagner.invoke(function(Category) {
+        return function(done) {
+          var categories = [
+              { _id: "Electronics" },
+              { _id: "Phones", parent: "Electronics" },
+              { _id: "Laptops", parent: "Electronics" },
+              { _id: "Bacon" }
+          ];
+           
+          Category.create(categories, function(error, categories) {
+             superagent.get(`${URL_ROOT}/parent/Electronics`, function(error, res) {
+                assert.ifError(error);
+                var result;
+                assert.doesNotThrow(function() {
+                    result = JSON.parse(res.text);
+                });
+                assert.equal(result.categories.length, 2);
+                assert.equal(result.categories[0]._id, "Laptops");
+                assert.equal(result.categories[1]._id, "Phones");
+                done();
+             });
+          });
+          
+        };
+    }));
 });
