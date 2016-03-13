@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var categoryRoute = require('./routes/category');
+var productRoute = require("./routes/product");
 var models = require("./schemas/models/models");
 
 module.exports = function(wagner) {
@@ -20,6 +21,7 @@ module.exports = function(wagner) {
 
     models(wagner);
     app.use('/category', categoryRoute(wagner));
+    app.use("/product", productRoute(wagner));
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {
