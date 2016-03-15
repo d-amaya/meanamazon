@@ -2,11 +2,23 @@ var wagner = require("wagner-core");
 var app = require("../app")(wagner);
 var assert = require("assert");
 var superagent = require("superagent");
+var utilTest = require("./utilTest");
+var status = require("http-status");
 
 describe("Amazon Rest API", function (){
+    var PRODUCT_ID = "000000000000000000000001";
     var server;
     
     before(function() {
+       var User = wagner.invoke(function(User) {
+           return User;
+       });
+       app.use(function(req, res, next) {
+            User.findOne({}, function(error, user) {
+                req.user = user;
+                next(); 
+            });
+       });
        server = app.listen(3000);
     });
 
@@ -46,12 +58,7 @@ describe("Amazon Rest API", function (){
         
         it("can load all categories that have a certain parent", wagner.invoke(function(Category) {
             return function(done) {
-            var categories = [
-                { _id: "Electronics" },
-                { _id: "Phones", parent: "Electronics" },
-                { _id: "Laptops", parent: "Electronics" },
-                { _id: "Bacon" }
-            ];
+            var categories = utilTest.categories();
             
             Category.create(categories, function(error, categories) {
                 superagent.get(`${URL}/parent/Electronics`, function(error, res) {
@@ -88,7 +95,6 @@ describe("Amazon Rest API", function (){
         
         it("can load a product by id", wagner.invoke(function(Product) {
             return function(done) {
-                var PRODUCT_ID = "000000000000000000000001";
                 var product = {
                     _id: PRODUCT_ID, 
                     name: "LG4", 
@@ -118,30 +124,8 @@ describe("Amazon Rest API", function (){
         
         it("can load all products in a category with sub-categories", wagner.invoke(function(Category, Product) {
             return function(done) {
-                var categories = [
-                    { _id: "Electronics" },
-                    { _id: "Phones", parent: "Electronics" },
-                    { _id: "Laptops", parent: "Electronics" },
-                    { _id: "Bacon" }
-                ];
-                
-                var products = [
-                    {
-                        name: "LG G4",
-                        category: { _id: "Phones", ancestors: ["Electronics", "Phones"] },
-                        price: { amount: 300, currency: "USD" }
-                    },
-                    {
-                        name: "Asus Zenbook Prime",
-                        category: { _id: "Laptops", ancestors: ["Electronics", "Laptops"] },
-                        price: { amount: 2000, currency: "USD" }
-                    },
-                    {
-                        name: "Flying Pigs Farm Posture Raised Pork Baicon",
-                        category: { _id: "Bacon", ancestors: ["Bacon"] },
-                        price: { amount: 20, currency: "USD" }
-                    },
-                ];
+                var categories = utilTest.categories();
+                var products = utilTest.products();
                 
                 Category.create(categories, function(error, categories) {
                     assert.ifError(error);
@@ -176,5 +160,86 @@ describe("Amazon Rest API", function (){
                 });
             };
         }));
-    })
+    });
+    
+    describe("User API", function() {
+        var URL = "http://localhost:3000/user";
+        
+        beforeEach("set up before any user test", wagner.invoke(function(Category, Product, User) {
+            return function(done) {
+                var categories = utilTest.categories();
+                var products = utilTest.products();
+                var users = utilTest.users();
+                
+                User.remove({}, function(error) {
+                    assert.ifError(error);
+                    Product.remove({}, function(error) {
+                        assert.ifError(error);
+                        Category.remove({}, function(error) {
+                            
+                            User.create(users, function(error, res) {
+                                assert.ifError(error);
+                                Category.create(categories, function(error) {
+                                    assert.ifError(error);
+                                    Product.create(products, function(error) {
+                                        assert.ifError(error);
+                                        done();
+                                    });
+                                }); 
+                            });
+                            
+                        });
+                    });
+                });
+            }   
+        }));
+        
+        it("can save users cart", wagner.invoke(function(User) {
+            return function(done) {
+                superagent
+                .put(`${URL}/me/cart`)
+                .send({
+                    data: {
+                        cart: [{ product: PRODUCT_ID, quantity: 1 }]
+                    }
+                }).
+                end(function(error, res) {
+                    assert.ifError(error);
+                    assert.equal(res.status, status.OK);
+                    User.findOne({}, function(error, user) {
+                        assert.ifError(error);
+                        assert.equal(user.data.cart.length, 1);
+                        assert.equal(user.data.cart[0].product, PRODUCT_ID);
+                        assert.equal(user.data.cart[0].qualityt, 1);
+                        done();
+                    });
+                });
+            };
+        }));
+        
+        it("can load users cart", wagner.invoke(function(User) {
+            return function(done) {
+                User.findOne({}, function(error, user) {
+                    assert.ifError(error);
+                    user.data.cart = [{ product: PRODUCT_ID, quality: 1 }];
+                    user.save(function(error) {
+                        assert.ifError(error);
+                        superagent.get(`${URL}/me`, function(error, res) {
+                            assert.ifError(error);
+                            assert.equal(res.status, 200);
+                            var result;
+                            assert.doesNotThrow(function() {
+                                result = JSON.parse(res.text).user; 
+                            });
+                            assert.ok(result);
+                            assert.equal(result.data.cart.length, 1);
+                            assert.equal(result.data.cart[0].product.name, "Asus Zenbook Prime");
+                            assert.equal(result.data.cart[0].quality, 1);
+                            done();
+                        });
+                    });
+                }); 
+            };
+        }));
+    });
 })

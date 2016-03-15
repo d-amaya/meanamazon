@@ -26,10 +26,10 @@ module.exports = function(wagner) {
             
             req.user.data.cart = cart;
             req.user.save(function(error, user) {
-               if (error) {
-                   return res.status(status.INTERNAL_SERVER_ERROR).json({ error: error.toString() });
-               }
-               res.json({ user: user });
+            if (error) {
+                return res.status(status.INTERNAL_SERVER_ERROR).json({ error: error.toString() });
+            }
+            res.status(status.OK).json({ user: user });
             });
         };
     }));

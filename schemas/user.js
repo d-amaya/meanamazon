@@ -10,7 +10,7 @@ var userSchema = {
         picture: {
             type: String,
             required: true,
-            match: /^http:\/\//i
+            match: /^(http:|https:)\/\//i
         }
     },
     data: {
