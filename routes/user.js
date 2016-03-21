@@ -1,9 +1,11 @@
 var express = require("express");
 var status = require("http-status");
+var bodyParser = require("body-parser");
 var handleResponse = require("./util/handleResponse");
 
 module.exports = function(wagner) {
     var router = express.Router();
+    router.use(bodyParser.json());
     
     router.get("/me", function(req, res) {
        if (!req.user) {
@@ -26,10 +28,10 @@ module.exports = function(wagner) {
             
             req.user.data.cart = cart;
             req.user.save(function(error, user) {
-            if (error) {
-                return res.status(status.INTERNAL_SERVER_ERROR).json({ error: error.toString() });
-            }
-            res.status(status.OK).json({ user: user });
+                if (error) {
+                    return res.status(status.INTERNAL_SERVER_ERROR).json({ error: error.toString() });
+                }
+                res.status(status.OK).json({ user: user });
             });
         };
     }));
