@@ -1,3 +1,5 @@
+process.env.NODE_ENV = "testing";
+
 var wagner = require("wagner-core");
 var app = require("../app")(wagner);
 var assert = require("assert");
@@ -5,20 +7,11 @@ var superagent = require("superagent");
 var utilTest = require("./utilTest");
 var status = require("http-status");
 
-describe("Amazon Rest API", function (){
+describe("Amazon Rest API", function () {
     var PRODUCT_ID = "000000000000000000000001";
     var server;
     
     before(function() {
-       var User = wagner.invoke(function(User) {
-           return User;
-       });
-       app.use(function(req, res, next) {
-            User.findOne({}, function(error, user) {
-                req.user = user;
-                next(); 
-            });
-       });
        server = app.listen(3000);
     });
 
@@ -165,7 +158,7 @@ describe("Amazon Rest API", function (){
     describe("User API", function() {
         var URL = "http://localhost:3000/user";
         
-        beforeEach("set up before any user test", wagner.invoke(function(Category, Product, User) {
+        before("set up before any user test", wagner.invoke(function(Category, Product, User) {
             return function(done) {
                 var categories = utilTest.categories();
                 var products = utilTest.products();
@@ -210,7 +203,7 @@ describe("Amazon Rest API", function (){
                         assert.ifError(error);
                         assert.equal(user.data.cart.length, 1);
                         assert.equal(user.data.cart[0].product, PRODUCT_ID);
-                        assert.equal(user.data.cart[0].qualityt, 1);
+                        assert.equal(user.data.cart[0].quantity, 1);
                         done();
                     });
                 });
@@ -221,7 +214,7 @@ describe("Amazon Rest API", function (){
             return function(done) {
                 User.findOne({}, function(error, user) {
                     assert.ifError(error);
-                    user.data.cart = [{ product: PRODUCT_ID, quality: 1 }];
+                    user.data.cart = [{ product: PRODUCT_ID, quantity: 1 }];
                     user.save(function(error) {
                         assert.ifError(error);
                         superagent.get(`${URL}/me`, function(error, res) {
@@ -229,12 +222,14 @@ describe("Amazon Rest API", function (){
                             assert.equal(res.status, 200);
                             var result;
                             assert.doesNotThrow(function() {
+                                //console.log(res.text);
                                 result = JSON.parse(res.text).user; 
+                                
                             });
                             assert.ok(result);
                             assert.equal(result.data.cart.length, 1);
                             assert.equal(result.data.cart[0].product.name, "Asus Zenbook Prime");
-                            assert.equal(result.data.cart[0].quality, 1);
+                            assert.equal(result.data.cart[0].quantity, 1);
                             done();
                         });
                     });

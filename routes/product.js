@@ -1,9 +1,11 @@
 var express = require("express");
 var status = require("http-status");
+var bodyParser = require("body-parser");
 var handleResponse = require("./util/handleResponse");
 
 module.exports = function (wagner) {
     var router = express.Router();
+    router.use(bodyParser.json());
     
     router.get("/id/:id", wagner.invoke(function (Product) {
         return function (req, res) {

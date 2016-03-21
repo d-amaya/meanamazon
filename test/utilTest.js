@@ -15,6 +15,7 @@ module.exports = {
                         price: { amount: 300, currency: "USD" }
                     },
                     {
+                        _id: "000000000000000000000001",
                         name: "Asus Zenbook Prime",
                         category: { _id: "Laptops", ancestors: ["Electronics", "Laptops"] },
                         price: { amount: 2000, currency: "USD" }
