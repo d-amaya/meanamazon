@@ -1,4 +1,5 @@
 var assert = require("assert");
+var status = require("http-status");
 var superagent = require("superagent");
 var utilTest = require("../util/utilTest");
 
@@ -82,6 +83,29 @@ module.exports = function(wagner, PRODUCT_ID) {
                             });
                         });
                     });
+                });
+            };
+        }));
+        
+        it("can search products by text", wagner.invoke(function (Product) {
+            return function (done) {
+                Product.create(utilTest.products(), function(error, products) {
+                   assert.ifError(error);
+                   superagent.get(`${URL}/text/asus`, function(error, res) {
+                       assert.ifError(error);
+                       assert.equal(res.status, status.OK);
+                       
+                       var result;
+                       assert.doesNotThrow(function () {
+                          result = JSON.parse(res.text); 
+                       });
+                       assert.ok(result.products);
+                       assert.equal(result.products.length, 1);
+                       assert.equal(result.products[0]._id, PRODUCT_ID);
+                       assert.equal(result.products[0].name, "Asus Zenbook Prime");
+                       
+                       done();
+                   });
                 });
             };
         }));

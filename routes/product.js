@@ -31,5 +31,18 @@ module.exports = function (wagner) {
         
     }));
     
+    router.get("/text/:query", wagner.invoke(function (Product) {
+        return function (req, res) {
+            Product.
+            find(
+                { $text: { $search: req.params.query } },
+                { score: { $meta: "textScore" } }
+            ).
+            sort({ score: { $meta: "textScore" } }).
+            limit(10).
+            exec(handleResponse.handleMany.bind(null, "products", res));   
+        };
+    }));
+    
     return router;
 }
