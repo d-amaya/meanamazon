@@ -20,13 +20,13 @@
     "serve-favicon": "~2.3.0",
     "stripe": "^4.5.0",
     "underscore": "^1.8.3",
-    "wagner-core": "^0.2.0"
+    "wagner-core": "^0.2.0",
+    "superagent": "^1.8.0-beta.2"
   },
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-mocha": "^2.2.0",
     "gulp-nodemon": "^2.0.6",
-    "mocha": "^2.4.5",
-    "superagent": "^1.8.0-beta.2"
+    "mocha": "^2.4.5"
   }
 }
