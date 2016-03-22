@@ -88,6 +88,8 @@ module.exports = function(wagner, PRODUCT_ID) {
         
         it("can checkout", wagner.invoke(function(User, Stripe) {
             return function(done) {
+                this.timeout(6000);
+                
                 User.findOne({}, function(error, user) {
                     assert.ifError(error);
                     user.data.cart = [{ product: PRODUCT_ID, quantity: 1 }];

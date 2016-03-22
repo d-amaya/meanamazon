@@ -1,9 +1,8 @@
 var superagent = require("superagent");
 var _ = require("underscore");
 
-module.exports = function () {
-    var OPEN_EXCHANGE_RATES_KEY = process.env.OPEN_EXCHANGE_RATES_KEY || "3a73c6ec7270418a9d0a57c54a0c17af";
-    var URL = `https://openexchangerates.org/api/latest.json?app_id=${OPEN_EXCHANGE_RATES_KEY}`;
+module.exports = function (Config) {
+    var URL = `https://openexchangerates.org/api/latest.json?app_id=${Config.openExchangeRatesKey}`;
     
     var rates = {
         USD: 1,

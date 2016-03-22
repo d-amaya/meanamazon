@@ -2,7 +2,7 @@ var expressSession = require("express-session");
 var passport = require("passport");
 var passportFacebook = require("passport-facebook");
 
-module.exports = function setupAuth (User, app) {
+module.exports = function setupAuth (Config, User, app) {
     var FacebookStrategy = passportFacebook.Strategy;
     
     passport.serializeUser(function (user, done) {
@@ -15,8 +15,8 @@ module.exports = function setupAuth (User, app) {
     
     passport.use(new FacebookStrategy(
         {
-            clientID: "1739257079644324" /*process.env.FACEBOOK_CLIENT_ID*/,
-            clientSecret: "b29a218363cdb102a27db3a74bc23647" /*process.env.FACEBOOK_CLIENT_SECRET*/,
+            clientID: Config.facebookClientId,
+            clientSecret: Config.facebookClientSecret,
             callbackURL: "http://localhost:3000/auth/facebook/callback/",
             profileFields: ['id', 'email', 'gender', 'link', 'locale', 'name', 'timezone', 'updated_time', 'verified']
         },
