@@ -19,7 +19,7 @@ module.exports = function(wagner) {
     wagner.invoke(auth, { app: app });
     
     app.use(logger('dev'));
-    app.use(express.static(path.join(__dirname, 'public')));
+    app.use("/public", express.static('public'));
     
     if (process.env.NODE_ENV === 'testing') {
         app.use(wagner.invoke(function (User) {

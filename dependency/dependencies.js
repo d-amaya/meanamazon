@@ -4,12 +4,14 @@ var fs = require("fs");
 
 module.exports = function(wagner) {
     
+    var Config = JSON.parse(fs.readFileSync('./config.json').toString());
     wagner.factory('Config', function() {
-        return JSON.parse(fs.readFileSync('./config.json').toString());
+        return Config;
     });
     
-    wagner.factory("Stripe", function(Config) {
-        return Stripe(Config.stripeKey);
+    var stripe = Stripe(Config.stripeKey);
+    wagner.factory("Stripe", function() {
+        return stripe
     });
     
     wagner.factory("fx", fx);

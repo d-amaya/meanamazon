@@ -34,12 +34,7 @@ module.exports = function (db, fx) {
     var schema = new mongoose.Schema(productSchema);
     schema.index({ name : "text" });
     
-    var currencySimbols = {
-        "USD": "$",
-        "EUR": "€",
-        "GBP": "£"
-    };
-    
+    var currencySimbols = { "USD": "$", "EUR": "€", "GBP": "£" };
     schema.virtual("displayPrice").get(function() {
         return currencySimbols[this.price.currency] + this.price.amount;
     });
